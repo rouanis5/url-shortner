@@ -1,0 +1,51 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Link {
+  id        String   @id @default(nanoid(15))
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+
+  expiresOn DateTime?
+  private   Boolean   @default(false)
+  singleUse Boolean   @default(false)
+  room      Room?     @relation(fields: [roomId], references: [id])
+  roomId    String?
+  User      User?     @relation(fields: [userId], references: [id])
+  userId    String?
+
+  @@map("links")
+}
+
+model Room {
+  id        String   @id @default(nanoid(15))
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+
+  name    String
+  private Boolean @default(true)
+  links   Link[]
+
+  @@map("rooms")
+}
+
+model User {
+  id        String   @id @default(nanoid(15))
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+
+  email    String @unique
+  password String @map("hashedPassword")
+  links    Link[]
+
+  @@map("users")
+}
