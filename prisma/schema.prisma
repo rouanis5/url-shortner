@@ -15,6 +15,7 @@ model Link {
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
 
+  url       String
   expiresOn DateTime?
   private   Boolean   @default(false)
   singleUse Boolean   @default(false)
