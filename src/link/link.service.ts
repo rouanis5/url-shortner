@@ -11,4 +11,28 @@ export class LinkService {
     const timezone = this.config.get('TZ');
     return { count, timezone };
   }
+
+  async getById(id: string) {
+    const result = await this.prisma.link.findFirst({
+      where: {
+        id,
+      },
+    });
+
+    if (!result) {
+      throw new Error('link not found');
+    }
+
+    return result;
+  }
+
+  async add(url: string) {
+    const newLink = await this.prisma.link.create({
+      data: {
+        url: url,
+      },
+    });
+
+    return newLink;
+  }
 }
