@@ -8,8 +8,8 @@ export class LinkService {
 
   async getCount() {
     const count = await this.prisma.link.count();
-    const timezone = this.config.get('TZ');
-    return { count, timezone };
+    // const timezone = this.config.get('TZ');
+    return { count };
   }
 
   async getById(id: string) {
