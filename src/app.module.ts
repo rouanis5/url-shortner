@@ -4,6 +4,7 @@ import { AppService } from './app.service';
 import { PrismaModule } from './prisma/prisma.module';
 import { LinkModule } from './link/link.module';
 import { ConfigModule } from '@nestjs/config';
+import { RoomModule } from './room/room.module';
 
 @Module({
   imports: [
@@ -12,6 +13,7 @@ import { ConfigModule } from '@nestjs/config';
     ConfigModule.forRoot({
       isGlobal: true,
     }),
+    RoomModule,
   ],
   controllers: [AppController],
   providers: [AppService],
