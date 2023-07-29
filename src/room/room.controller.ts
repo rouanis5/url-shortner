@@ -1,4 +1,12 @@
-import { Controller } from '@nestjs/common';
+import { Controller, Get } from '@nestjs/common';
+import { RoomService } from './room.service';
 
-@Controller('room')
-export class RoomController {}
+@Controller('rooms')
+export class RoomController {
+  constructor(private roomService: RoomService) {}
+
+  @Get('welcome')
+  welcome() {
+    return this.roomService.welcome();
+  }
+}
