@@ -9,7 +9,8 @@ import {
 import { LinkService } from './link.service';
 import { CreateLinkDTO } from './dto/createLink.dto';
 import { IdDTO } from './dto/id.dto';
-
+import { SkipThrottle } from '@nestjs/throttler';
+@SkipThrottle()
 @Controller('links')
 export class LinkController {
   constructor(private linkService: LinkService) {}
@@ -24,6 +25,7 @@ export class LinkController {
     return this.linkService.getCount();
   }
 
+  @SkipThrottle(false)
   @Post('/')
   addLink(@Body() body: CreateLinkDTO) {
     return this.linkService.add(body.url);
