@@ -1,10 +1,10 @@
 {
   "name": "url-shortener",
-  "version": "0.0.1",
   "description": "build a simple url shortner api with nestJS",
-  "author": "",
-  "private": true,
-  "license": "UNLICENSED",
+  "version": "1.0.0",
+  "repository": "git@github.com:rouanis5/url-shortner.git",
+  "author": "rouanis5 <ouanis42@gmail.com>",
+  "license": "MIT",
   "scripts": {
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
