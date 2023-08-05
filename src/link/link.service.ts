@@ -2,6 +2,12 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PrismaService } from 'src/prisma/prisma.service';
 
+interface INewLink {
+  url: string;
+  expiresOn?: Date;
+  singleUse?: boolean;
+}
+
 @Injectable()
 export class LinkService {
   constructor(private prisma: PrismaService, private config: ConfigService) {}
@@ -19,20 +25,25 @@ export class LinkService {
       },
     });
 
-    if (!result) {
-      throw new Error('link not found');
-    }
-
     return result;
   }
 
-  async add(url: string) {
+  // TODO: add
+  async add(body: INewLink) {
     const newLink = await this.prisma.link.create({
       data: {
-        url: url,
+        ...body,
       },
     });
 
     return newLink;
+  }
+
+  async deleteById(id: string) {
+    await this.prisma.link.delete({
+      where: {
+        id,
+      },
+    });
   }
 }
