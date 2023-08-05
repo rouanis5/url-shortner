@@ -6,6 +6,7 @@ import { LinkModule } from './link/link.module';
 import { ConfigModule } from '@nestjs/config';
 import { RoomModule } from './room/room.module';
 import { ThrottlerModule } from '@nestjs/throttler';
+import { UserModule } from './user/user.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { ThrottlerModule } from '@nestjs/throttler';
       isGlobal: true,
     }),
     RoomModule,
+    UserModule,
   ],
   controllers: [AppController],
   providers: [AppService],
