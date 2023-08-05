@@ -3,6 +3,7 @@ import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import helmet from 'helmet';
 import * as morgan from 'morgan';
+import { ApiConfigService } from './api-config/api-config.service';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -12,7 +13,11 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
   //enable CORS
   app.enableCors();
-  await app.listen(3000);
+  // get app port
+  const apiConfigService = app.get(ApiConfigService);
+  const port = apiConfigService.getAppPort();
+
+  await app.listen(port);
 }
 
 bootstrap();

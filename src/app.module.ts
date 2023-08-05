@@ -7,6 +7,8 @@ import { ConfigModule } from '@nestjs/config';
 import { RoomModule } from './room/room.module';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { UserModule } from './user/user.module';
+import { validate } from './config/env.validation';
+import { ApiConfigModule } from './api-config/api-config.module';
 
 @Module({
   imports: [
@@ -18,9 +20,11 @@ import { UserModule } from './user/user.module';
     LinkModule,
     ConfigModule.forRoot({
       isGlobal: true,
+      validate,
     }),
     RoomModule,
     UserModule,
+    ApiConfigModule,
   ],
   controllers: [AppController],
   providers: [AppService],
