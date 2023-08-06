@@ -4,6 +4,7 @@ import {
   IsNumber,
   IsString,
   IsTimeZone,
+  Length,
   validateSync,
 } from 'class-validator';
 
@@ -13,6 +14,10 @@ export class EnvironmentVariables {
 
   @IsNumber()
   APP_PORT: number;
+
+  @IsNotEmpty()
+  @Length(64)
+  ACCESS_TOKEN_SECRET_KEY: string;
 
   //  database validation
   @IsString()
