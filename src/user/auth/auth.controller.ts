@@ -1,18 +1,45 @@
 import { Body, Controller, Post } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { SignInDto, SignUpDto } from '../dtos';
+import { AuthResponseDto, SignInDto, SignUpDto } from '../dtos';
+import {
+  ApiBadRequestResponse,
+  ApiCreatedResponse,
+  ApiTags,
+  ApiUnauthorizedResponse,
+} from '@nestjs/swagger';
 
 @Controller('auth')
+@ApiTags('Auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('signup')
-  async signup(@Body() body: SignUpDto) {
-    await this.authService.signUp(body);
+  @ApiCreatedResponse({
+    description: 'user signup successsfully and gets a token',
+    type: AuthResponseDto,
+  })
+  @ApiBadRequestResponse({
+    description: 'wrong credantials',
+  })
+  @ApiUnauthorizedResponse({
+    description: 'unauthorized',
+  })
+  async signup(@Body() body: SignUpDto): Promise<AuthResponseDto> {
+    return await this.authService.signUp(body);
   }
 
   @Post('signin')
-  async signin(@Body() body: SignInDto) {
-    await this.authService.signIn(body);
+  @ApiCreatedResponse({
+    description: 'user sign in successsfully and gets a token',
+    type: AuthResponseDto,
+  })
+  @ApiBadRequestResponse({
+    description: 'wrong credantials',
+  })
+  @ApiUnauthorizedResponse({
+    description: 'unauthorized',
+  })
+  async signin(@Body() body: SignInDto): Promise<AuthResponseDto> {
+    return await this.authService.signIn(body);
   }
 }
