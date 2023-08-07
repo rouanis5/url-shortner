@@ -15,29 +15,34 @@ import { CreateLinkDTO } from './dto/createLink.dto';
 import { IdDTO } from './dto/id.dto';
 import { SkipThrottle } from '@nestjs/throttler';
 import dayjs from 'dayjs';
+import { ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
+import { AddLinkResponse, LinksCountResponse } from './dto/responses.dto';
+
+@ApiTags('Links')
 @SkipThrottle()
 @Controller('links')
 export class LinkController {
   constructor(private linkService: LinkService) {}
 
-  @Get('/')
-  getLinks() {
-    return { message: 'i am a dragon' };
-  }
-
-  @Get('/count')
-  getCount() {
-    return this.linkService.getCount();
-  }
-
-  @SkipThrottle(false)
   @Post('/')
-  addLink(@Body() body: CreateLinkDTO) {
-    return this.linkService.add({
+  @ApiCreatedResponse({
+    description: 'link created successfully',
+    type: AddLinkResponse,
+  })
+  async addLink(@Body() body: CreateLinkDTO): Promise<AddLinkResponse> {
+    const link = await this.linkService.add({
       url: body.url,
       expiresOn: body.expiresOn,
       singleUse: body.singleUse,
     });
+
+    return new AddLinkResponse(link);
+  }
+
+  @SkipThrottle(false)
+  @Get('/count')
+  getCount(): Promise<LinksCountResponse> {
+    return this.linkService.getCount();
   }
 
   @Get('/:id')
