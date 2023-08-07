@@ -1,5 +1,6 @@
 import { plainToInstance } from 'class-transformer';
 import {
+  IsEnum,
   IsNotEmpty,
   IsNumber,
   IsString,
@@ -7,6 +8,7 @@ import {
   Length,
   validateSync,
 } from 'class-validator';
+import { NodeEnvEnum } from './env.type';
 
 export class EnvironmentVariables {
   @IsTimeZone()
@@ -14,6 +16,9 @@ export class EnvironmentVariables {
 
   @IsNumber()
   APP_PORT: number;
+
+  @IsEnum(NodeEnvEnum)
+  NODE_ENV: NodeEnvEnum;
 
   @IsNotEmpty()
   @Length(64)
