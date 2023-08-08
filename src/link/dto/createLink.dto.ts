@@ -3,7 +3,6 @@ import { Type } from 'class-transformer';
 import {
   IsBoolean,
   IsDate,
-  IsDateString,
   IsNotEmpty,
   IsOptional,
   IsUrl,
@@ -24,6 +23,7 @@ export class CreateLinkDTO {
     required: false,
   })
   @IsOptional()
+  @Type(() => Date)
   @IsDate()
   expiresOn: Date;
 

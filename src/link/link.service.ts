@@ -1,6 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PrismaService } from 'src/prisma/prisma.service';
+import dayjs from 'dayjs';
+import { GoneException, NotFoundException } from '@nestjs/common';
 
 interface INewLink {
   url: string;
@@ -24,6 +26,21 @@ export class LinkService {
         id,
       },
     });
+
+    if (!result) {
+      throw new NotFoundException();
+    }
+
+    // delete if expired
+    if (result.expiresOn && dayjs().isAfter(result.expiresOn)) {
+      this.deleteById(id);
+      throw new GoneException();
+    }
+
+    // delete if single urse
+    if (result.singleUse === true) {
+      this.deleteById(id);
+    }
 
     return result;
   }

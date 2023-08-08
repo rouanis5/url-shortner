@@ -2,10 +2,8 @@ import {
   Body,
   Controller,
   Get,
-  GoneException,
   HttpCode,
   HttpStatus,
-  NotFoundException,
   Param,
   Post,
   Redirect,
@@ -14,8 +12,14 @@ import { LinkService } from './link.service';
 import { CreateLinkDTO } from './dto/createLink.dto';
 import { IdDTO } from './dto/id.dto';
 import { SkipThrottle } from '@nestjs/throttler';
-import dayjs from 'dayjs';
-import { ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBadRequestResponse,
+  ApiCreatedResponse,
+  ApiGoneResponse,
+  ApiMovedPermanentlyResponse,
+  ApiNotFoundResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { AddLinkResponse, LinksCountResponse } from './dto/responses.dto';
 
 @ApiTags('Links')
@@ -29,6 +33,9 @@ export class LinkController {
     description: 'link created successfully',
     type: AddLinkResponse,
   })
+  @ApiBadRequestResponse({
+    description: 'bad request',
+  })
   async addLink(@Body() body: CreateLinkDTO): Promise<AddLinkResponse> {
     const link = await this.linkService.add({
       url: body.url,
@@ -39,8 +46,11 @@ export class LinkController {
     return new AddLinkResponse(link);
   }
 
-  @SkipThrottle(false)
   @Get('/count')
+  @SkipThrottle(false)
+  @ApiCreatedResponse({
+    type: LinksCountResponse,
+  })
   getCount(): Promise<LinksCountResponse> {
     return this.linkService.getCount();
   }
@@ -48,24 +58,35 @@ export class LinkController {
   @Get('/:id')
   @HttpCode(HttpStatus.MOVED_PERMANENTLY) // 301
   @Redirect()
-  async getLinkById(@Param() params: IdDTO) {
+  @ApiMovedPermanentlyResponse({
+    description: 'redirect directly',
+  })
+  @ApiNotFoundResponse({
+    description: 'not found',
+  })
+  @ApiGoneResponse({
+    description: 'link expired',
+  })
+  async redirectToLinkById(@Param() params: IdDTO) {
     const link = await this.linkService.getById(params.id);
 
-    if (!link) {
-      throw new NotFoundException();
-    }
-
-    // delete if expired
-    if (link.expiresOn && dayjs().isAfter(link.expiresOn)) {
-      this.linkService.deleteById(params.id);
-      throw new GoneException();
-    }
-
-    // delete if single urse
-    if (link.singleUse === true) {
-      this.linkService.deleteById(params.id);
-    }
-
     return { url: link.url };
+  }
+
+  @Get('/:id/properties')
+  @ApiCreatedResponse({
+    description: 'link found',
+    type: AddLinkResponse,
+  })
+  @ApiNotFoundResponse({
+    description: 'not found',
+  })
+  @ApiGoneResponse({
+    description: 'link expired',
+  })
+  async getLinkById(@Param() param: IdDTO) {
+    const link = await this.linkService.getById(param.id);
+
+    return new AddLinkResponse(link);
   }
 }
