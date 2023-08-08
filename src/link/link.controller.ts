@@ -15,7 +15,6 @@ import { SkipThrottle } from '@nestjs/throttler';
 import {
   ApiBadRequestResponse,
   ApiCreatedResponse,
-  ApiGoneResponse,
   ApiMovedPermanentlyResponse,
   ApiNotFoundResponse,
   ApiTags,
@@ -64,9 +63,6 @@ export class LinkController {
   @ApiNotFoundResponse({
     description: 'not found',
   })
-  @ApiGoneResponse({
-    description: 'link expired',
-  })
   async redirectToLinkById(@Param() params: IdDTO) {
     const link = await this.linkService.getById(params.id);
 
@@ -80,9 +76,6 @@ export class LinkController {
   })
   @ApiNotFoundResponse({
     description: 'not found',
-  })
-  @ApiGoneResponse({
-    description: 'link expired',
   })
   async getLinkById(@Param() param: IdDTO) {
     const link = await this.linkService.getById(param.id);
