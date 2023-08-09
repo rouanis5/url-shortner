@@ -10,7 +10,7 @@ import {
 } from '@nestjs/common';
 import { LinkService } from './link.service';
 import { CreateLinkDTO } from './dto/createLink.dto';
-import { IdDTO } from './dto/id.dto';
+import { IdDTO } from '../common/dto/id.dto';
 import { SkipThrottle } from '@nestjs/throttler';
 import {
   ApiBadRequestResponse,
