@@ -62,7 +62,9 @@ model RoomMember {
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
 
-  IsAdmin Boolean @default(false)
+  isAdmin     Boolean @default(false)
+  isActivated Boolean @default(false)
+  isBanned    Boolean @default(false)
 
   room   Room   @relation(fields: [roomId], references: [id])
   roomId String
