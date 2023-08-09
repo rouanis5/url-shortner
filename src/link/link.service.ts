@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { PrismaService } from 'src/prisma/prisma.service';
 import dayjs from 'dayjs';
 import { NotFoundException } from '@nestjs/common';
@@ -12,16 +11,16 @@ interface INewLink {
 
 @Injectable()
 export class LinkService {
-  constructor(private prisma: PrismaService, private config: ConfigService) {}
+  constructor(private prismaService: PrismaService) {}
 
   async getCount() {
-    const count = await this.prisma.link.count();
+    const count = await this.prismaService.link.count();
     // const timezone = this.config.get('TZ');
     return { count };
   }
 
   async getById(id: string) {
-    const result = await this.prisma.link.findFirst({
+    const result = await this.prismaService.link.findFirst({
       where: {
         id,
       },
@@ -47,7 +46,7 @@ export class LinkService {
 
   // TODO: add
   async add(body: INewLink) {
-    const newLink = await this.prisma.link.create({
+    const newLink = await this.prismaService.link.create({
       data: {
         ...body,
       },
@@ -57,7 +56,7 @@ export class LinkService {
   }
 
   async deleteById(id: string) {
-    await this.prisma.link.delete({
+    return await this.prismaService.link.delete({
       where: {
         id,
       },
