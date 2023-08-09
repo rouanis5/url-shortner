@@ -6,6 +6,7 @@ import * as morgan from 'morgan';
 import { ApiConfigService } from './api-config/api-config.service';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { NodeEnvEnum } from './config/env.type';
+import { SWAGGER_ENUM } from './common/enums';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -40,6 +41,18 @@ async function bootstrap() {
     const config = new DocumentBuilder()
       .setTitle('url shortner')
       .setVersion('1.0')
+      .addBearerAuth(
+        {
+          // I was also testing it without prefix 'Bearer ' before the JWT
+          description: `[just text field] Please enter token in following format: Bearer <JWT>`,
+          name: 'Authorization',
+          bearerFormat: 'Bearer', // I`ve tested not to use this field, but the result was the same
+          scheme: 'Bearer',
+          type: 'http', // I`ve attempted type: 'apiKey' too
+          in: 'Header',
+        },
+        SWAGGER_ENUM.AUTHORIZATION_HEADER, // This name here is important for matching up with @ApiBearerAuth() in your controller!
+      )
       .build();
     const document = SwaggerModule.createDocument(app, config);
     SwaggerModule.setup('docs', app, document);
