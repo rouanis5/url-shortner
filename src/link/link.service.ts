@@ -7,6 +7,12 @@ interface INewLink {
   url: string;
   expiresOn?: Date;
   singleUse?: boolean;
+  userId?: string;
+}
+
+interface ILinkUser {
+  id: string;
+  userId?: string;
 }
 
 @Injectable()
@@ -32,19 +38,18 @@ export class LinkService {
 
     // delete if expired
     if (result.expiresOn && dayjs().isAfter(result.expiresOn)) {
-      this.deleteById(id);
+      this.deleteById({ id });
       throw new NotFoundException();
     }
 
     // delete if single urse
     if (result.singleUse === true) {
-      this.deleteById(id);
+      this.deleteById({ id });
     }
 
     return result;
   }
 
-  // TODO: add
   async add(body: INewLink) {
     const newLink = await this.prismaService.link.create({
       data: {
@@ -55,10 +60,11 @@ export class LinkService {
     return newLink;
   }
 
-  async deleteById(id: string) {
+  async deleteById(body: ILinkUser) {
     return await this.prismaService.link.delete({
       where: {
-        id,
+        id: body.id,
+        userId: body.userId,
       },
     });
   }
