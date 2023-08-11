@@ -1,9 +1,20 @@
-import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Param,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
 import { RoomService } from './room.service';
 import {
   ApiAcceptedResponse,
   ApiBadRequestResponse,
   ApiBearerAuth,
+  ApiConflictResponse,
+  ApiCreatedResponse,
   ApiNotFoundResponse,
   ApiTags,
   ApiUnauthorizedResponse,
@@ -83,6 +94,29 @@ export class RoomController {
     });
 
     return new RoomResponseDto(room);
+  }
+
+  @Get('/:id/join')
+  @HttpCode(HttpStatus.CREATED)
+  @ApiBearerAuth(SWAGGER_ENUM.AUTHORIZATION_HEADER)
+  @ApiCreatedResponse()
+  @ApiNotFoundResponse()
+  @ApiConflictResponse({ description: 'already a member' })
+  @ApiBadRequestResponse({
+    description: 'wrong id, id of type nanoid(15)',
+  })
+  @ApiUnauthorizedResponse()
+  async joinRoom(
+    @Param() params: IdDTO,
+    @User() user: IJwtPayload,
+  ): Promise<void> {
+    const room = await this.roomService.getRoom(params.id);
+
+    await this.memberService.join({
+      isPrivateRoom: room.private,
+      roomId: params.id,
+      userId: user.id,
+    });
   }
 
   @Get('/:id/members')
