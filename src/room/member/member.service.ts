@@ -4,6 +4,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { MemberResponseDto } from '../dto/memberResponse.dto';
 // import { RoomService } from '../room.service';
 
 interface IMember {
@@ -179,5 +180,26 @@ export class MemberService {
         id: membership.id,
       },
     });
+  }
+
+  async getMembers(roomId: string): Promise<MemberResponseDto[]> {
+    const members = await this.prismaService.roomMember.findMany({
+      where: {
+        roomId,
+      },
+      include: {
+        user: {
+          select: {
+            email: true,
+          },
+        },
+      },
+    });
+
+    return members.map((member) => ({
+      ...member,
+      user: undefined,
+      email: member.user.email,
+    }));
   }
 }

@@ -1,9 +1,10 @@
-import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
 import { RoomService } from './room.service';
 import {
   ApiAcceptedResponse,
   ApiBadRequestResponse,
   ApiBearerAuth,
+  ApiNotFoundResponse,
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
@@ -13,12 +14,18 @@ import { User } from 'src/user/decorators/user.decorator';
 import { RoomResponseDto } from './dto/roomResponse.dto';
 import { CreateRoomDto } from './dto/createRoom.dto';
 import { SWAGGER_ENUM } from 'src/common/enums';
+import { IdDTO } from 'src/common/dto/id.dto';
+import { MemberService } from './member/member.service';
+import { MemberResponseDto } from './dto/memberResponse.dto';
 
 @Controller('rooms')
 @ApiTags('Rooms')
 @UseGuards(AuthGuard)
 export class RoomController {
-  constructor(private roomService: RoomService) {}
+  constructor(
+    private roomService: RoomService,
+    private memberService: MemberService,
+  ) {}
 
   @Post()
   @ApiBearerAuth(SWAGGER_ENUM.AUTHORIZATION_HEADER)
@@ -50,5 +57,59 @@ export class RoomController {
   async getRooms(@User() user: IJwtPayload): Promise<RoomResponseDto[]> {
     const rooms = await this.roomService.getSubscribedRooms(user.id);
     return rooms.map((room) => new RoomResponseDto(room));
+  }
+
+  @Get('/:id')
+  @ApiBearerAuth(SWAGGER_ENUM.AUTHORIZATION_HEADER)
+  @ApiAcceptedResponse({
+    type: RoomResponseDto,
+  })
+  @ApiNotFoundResponse()
+  @ApiBadRequestResponse({
+    description: 'wrong id, id of type nanoid(15)',
+  })
+  @ApiUnauthorizedResponse()
+  async getRoomById(
+    @Param() params: IdDTO,
+    @User() user: IJwtPayload,
+  ): Promise<RoomResponseDto> {
+    // get the room
+    const room = await this.roomService.getRoom(params.id);
+
+    // check membership
+    await this.memberService.getMembership({
+      roomId: params.id,
+      userId: user.id,
+    });
+
+    return new RoomResponseDto(room);
+  }
+
+  @Get('/:id/members')
+  @ApiBearerAuth(SWAGGER_ENUM.AUTHORIZATION_HEADER)
+  @ApiAcceptedResponse({
+    type: MemberResponseDto,
+    isArray: true,
+  })
+  @ApiNotFoundResponse()
+  @ApiBadRequestResponse({
+    description: 'wrong id, id of type nanoid(15)',
+  })
+  @ApiUnauthorizedResponse()
+  async getRoomMembers(
+    @Param() params: IdDTO,
+    @User() user: IJwtPayload,
+  ): Promise<MemberResponseDto[]> {
+    await this.roomService.getRoom(params.id);
+
+    // check membership
+    await this.memberService.getMembership({
+      roomId: params.id,
+      userId: user.id,
+    });
+
+    // return members list
+    const members = await this.memberService.getMembers(params.id);
+    return members.map((member) => new MemberResponseDto(member));
   }
 }
