@@ -1,6 +1,6 @@
 import { IsString, Length } from 'class-validator';
 
-export class roomMeberParamsDto {
+export class roomMemberParamsDto {
   @IsString()
   @Length(15, 15)
   id: string;

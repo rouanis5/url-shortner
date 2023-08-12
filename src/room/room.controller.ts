@@ -27,12 +27,10 @@ import { CreateRoomDto } from './dto/createRoom.dto';
 import { SWAGGER_ENUM } from 'src/common/enums';
 import { IdDTO } from 'src/common/dto/id.dto';
 import { MemberService } from './member/member.service';
-import { MemberResponseDto } from './dto/memberResponse.dto';
-import { roomMeberParamsDto } from './dto/roomMemberParams.dto';
 
 @Controller('rooms')
 @ApiTags('Rooms')
-// @UseGuards(AuthGuard)
+@UseGuards(AuthGuard)
 export class RoomController {
   constructor(
     private roomService: RoomService,
@@ -117,57 +115,6 @@ export class RoomController {
       isPrivateRoom: room.private,
       roomId: params.id,
       userId: user.id,
-    });
-  }
-
-  @Get('/:id/members')
-  @ApiBearerAuth(SWAGGER_ENUM.AUTHORIZATION_HEADER)
-  @ApiAcceptedResponse({
-    type: MemberResponseDto,
-    isArray: true,
-  })
-  @ApiNotFoundResponse()
-  @ApiBadRequestResponse({
-    description: 'wrong id, id of type nanoid(15)',
-  })
-  @ApiUnauthorizedResponse()
-  async getRoomMembers(
-    @Param() params: IdDTO,
-    @User() user: IJwtPayload,
-  ): Promise<MemberResponseDto[]> {
-    await this.roomService.getRoom(params.id);
-
-    // check membership
-    await this.memberService.getMembership({
-      roomId: params.id,
-      userId: user.id,
-    });
-
-    // return members list
-    const members = await this.memberService.getMembers(params.id);
-    return members.map((member) => new MemberResponseDto(member));
-  }
-
-  @Get('/:id/members/:memberId/validate')
-  @HttpCode(HttpStatus.CREATED)
-  @ApiBearerAuth(SWAGGER_ENUM.AUTHORIZATION_HEADER)
-  @ApiCreatedResponse()
-  @ApiNotFoundResponse()
-  @ApiConflictResponse({ description: 'already a member' })
-  @ApiBadRequestResponse({
-    description: 'wrong id, id of type nanoid(15)',
-  })
-  @ApiUnauthorizedResponse()
-  async validateNewMember(
-    @Param() params: roomMeberParamsDto,
-    @User() user: IJwtPayload,
-  ) {
-    await this.roomService.getRoom(params.id);
-
-    await this.memberService.validateMembership({
-      adminId: user.id,
-      roomId: params.id,
-      memberId: params.memberId,
     });
   }
 }
