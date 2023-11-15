@@ -21,11 +21,13 @@
     "generate:token": "node randomToken.js"
   },
   "dependencies": {
+    "@fastify/static": "^6.12.0",
     "@nestjs/common": "^10.1.2",
     "@nestjs/config": "^3.0.0",
     "@nestjs/core": "^10.1.2",
     "@nestjs/jwt": "^10.1.0",
     "@nestjs/platform-express": "^10.1.2",
+    "@nestjs/platform-fastify": "^10.2.8",
     "@nestjs/swagger": "^7.1.7",
     "@nestjs/throttler": "^4.2.1",
     "@prisma/client": "5.0.0",

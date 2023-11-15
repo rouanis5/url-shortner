@@ -1,6 +1,10 @@
 import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
+import {
+  FastifyAdapter,
+  NestFastifyApplication,
+} from '@nestjs/platform-fastify';
+import { AppModule } from './app.module';
 import helmet from 'helmet';
 import * as morgan from 'morgan';
 import { ApiConfigService } from './api-config/api-config.service';
@@ -9,7 +13,11 @@ import { NodeEnvEnum } from './config/env.type';
 import { SWAGGER_ENUM } from './common/enums';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  // use fastify instead of express
+  const app = await NestFactory.create<NestFastifyApplication>(
+    AppModule,
+    new FastifyAdapter(),
+  );
   // protect your app from some well-known web vulnerabilities by setting HTTP headers appropriately
   app.use(helmet());
 
